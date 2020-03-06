@@ -26,7 +26,9 @@ firebase
 	})
 	.catch(function(err) {
 		if (err.code === "failed-precondition") {
+			console.log(err);
 		} else if (err.code === "unimplemented") {
+			console.log(err);
 		}
 	});
 
@@ -37,7 +39,8 @@ export default class MainPage extends Component {
 		formData: "",
 		flag: false,
 		offline: false,
-		online: false
+		online: true,
+		firebaseData: []
 	};
 
 	connectionCheck = () => {
@@ -94,10 +97,40 @@ export default class MainPage extends Component {
 
 	componentDidMount() {
 		this.connectionCheck();
+		var that = this;
+		db.collection("formData").onSnapshot(
+			{ includeMetadataChanges: true },
+			function(snapshot) {
+				snapshot.docChanges().forEach(function(change) {
+					if (change.type === "added") {
+						that.state.firebaseData.push(change.doc.data());
+						console.log("New city: ", change.doc.data());
+					}
+
+					var source = snapshot.metadata.fromCache
+						? "local cache"
+						: "server";
+					console.log("Data came from " + source);
+				});
+			}
+		);
 	}
 
 	render() {
 		console.log(this.state);
+
+		if (this.state.firebaseData.length > 0) {
+			console.log("here");
+			var tableDataFirebase = this.state.firebaseData.map(
+				(elem, index) => (
+					<tr key={index}>
+						<th scope="row">{index}</th>
+						<td>{elem.data}</td>
+					</tr>
+				)
+			);
+		}
+
 		// this.connectionCheck();
 		return (
 			<div>
@@ -122,6 +155,26 @@ export default class MainPage extends Component {
 						>
 							Add Data to FireBase
 						</button>
+					</div>
+					<br />
+					<br />
+					<br />
+					<div>
+						<table className="table">
+							<thead>
+								<tr>
+									<th scope="col">ID</th>
+									<th scope="col">Data</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<th scope="row">1</th>
+									<td>Mark</td>
+								</tr>
+								{tableDataFirebase}
+							</tbody>
+						</table>
 					</div>
 				</div>
 			</div>

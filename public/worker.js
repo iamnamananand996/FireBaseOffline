@@ -5,8 +5,7 @@ var urlsToCache = [
 	"../../src/App.js",
 	"../../src/MainPage.js",
 	"manifest.json",
-	"favicon.ico",
-	"../node_modules"
+	"favicon.ico"
 ];
 
 // Install a service worker
