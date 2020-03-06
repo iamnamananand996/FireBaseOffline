@@ -25,10 +25,12 @@ firebase
 		console.log("offline Mode Enabale");
 	})
 	.catch(function(err) {
-		if (err.code == "failed-precondition") {
-		} else if (err.code == "unimplemented") {
+		if (err.code === "failed-precondition") {
+		} else if (err.code === "unimplemented") {
 		}
 	});
+
+const db = firebase.firestore();
 
 export default class MainPage extends Component {
 	state = {
@@ -39,11 +41,13 @@ export default class MainPage extends Component {
 	};
 
 	connectionCheck = () => {
+		var that = this;
+		console.log("here");
 		window.addEventListener(
 			"online",
 			function(e) {
 				console.log("online");
-				this.setState({ online: true });
+				that.setState({ online: true, offline: false });
 			},
 			false
 		);
@@ -52,20 +56,26 @@ export default class MainPage extends Component {
 			"offline",
 			function(e) {
 				console.log("offline");
-				this.setState({ offline: true });
+				that.setState({ offline: true, online: false });
 			},
 			false
 		);
 	};
 
 	sendDatatoFirebase = () => {
+		console.log(this.state.formData);
+		var that = this;
 		if (this.state.online) {
 			firebase
 				.firestore()
 				.enableNetwork()
 				.then(function() {
 					// Do online actions
-					// ...
+					var dataTest = db.collection("formData");
+
+					dataTest.doc(that.state.formData).set({
+						data: that.state.formData
+					});
 				});
 		} else {
 			firebase
@@ -73,7 +83,11 @@ export default class MainPage extends Component {
 				.disableNetwork()
 				.then(function() {
 					// Do offline actions
-					// ...
+					var dataTest = db.collection("formData");
+					console.log(that.state.formData);
+					dataTest.doc(that.state.formData).set({
+						data: that.state.formData
+					});
 				});
 		}
 	};
@@ -83,6 +97,8 @@ export default class MainPage extends Component {
 	}
 
 	render() {
+		console.log(this.state);
+		// this.connectionCheck();
 		return (
 			<div>
 				<div className="jumbotron text-center">
@@ -102,7 +118,7 @@ export default class MainPage extends Component {
 						<br />
 						<button
 							className="btn btn-primary"
-							onClick={() => this.setState({ flag: true })}
+							onClick={this.sendDatatoFirebase}
 						>
 							Add Data to FireBase
 						</button>
