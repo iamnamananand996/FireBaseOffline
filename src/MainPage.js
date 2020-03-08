@@ -74,10 +74,10 @@ export default class MainPage extends Component {
 				.enableNetwork()
 				.then(function() {
 					// Do online actions
-					var dataTest = db.collection("formData");
+					var dataTest = db.collection("formData").doc();
 
-					dataTest.doc(that.state.formData).set({
-						data: that.state.formData
+					dataTest.set({
+						name: that.state.formData
 					});
 				});
 		} else {
@@ -86,10 +86,10 @@ export default class MainPage extends Component {
 				.disableNetwork()
 				.then(function() {
 					// Do offline actions
-					var dataTest = db.collection("formData");
+					var dataTest = db.collection("formData").doc();
 					console.log(that.state.formData);
-					dataTest.doc(that.state.formData).set({
-						data: that.state.formData
+					dataTest.set({
+						name: that.state.formData
 					});
 				});
 		}
